@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth";
 import type { Settings } from "@/lib/types";
-import { saveSettings, sendTestSms } from "../actions";
+import { saveSettings, sendTestSms, uploadLogo, removeLogo } from "../actions";
+import { publicImageUrl } from "@/lib/supabase/admin";
 import Flash from "../flash";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -11,11 +12,33 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const { supabase } = await requireAdmin();
   const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
   const s = data as Settings;
+  const logo = publicImageUrl(s.logo_path ?? null);
 
   return (
     <>
       <h1>Settings</h1>
       <Flash ok={ok} err={err} />
+
+      <h2 style={{ marginTop: 0 }}>Logo</h2>
+      <div className="box logo-admin">
+        <div className="logo-preview">
+          {logo ? <img src={logo} alt={`${s.shop_name} logo`} /> : <span>No logo yet. The shop name shows in its place.</span>}
+        </div>
+        <div>
+          <form action={uploadLogo}>
+            <label className="field">
+              <span>{logo ? "Replace logo" : "Upload a logo"} <small>(PNG with a transparent background works best; JPG or WebP also OK, up to 2 MB)</small></span>
+              <input className="input" type="file" name="logo" accept="image/png,image/jpeg,image/webp" required />
+            </label>
+            <button className="btn" type="submit">{logo ? "Replace logo" : "Upload logo"}</button>
+          </form>
+          {logo && (
+            <form action={removeLogo} style={{ marginTop: 8 }}>
+              <button className="btn danger" type="submit">Remove logo</button>
+            </form>
+          )}
+        </div>
+      </div>
 
       <form action={saveSettings}>
         <div className="box">

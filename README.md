@@ -44,7 +44,7 @@ Stack: Next.js 15 on **Vercel**, **Supabase** (Postgres, Auth, Storage), **Strip
 
 ### 5. First run
 1. Go to `https://YOUR-DOMAIN/admin` and sign in.
-2. In **Settings**, set the pickup address, delivery fee and ZIP codes, hours, slot length, orders per slot, and alert phones. Click **Send a test text**.
+2. In **Settings**, upload your logo, then set the pickup address, delivery fee and ZIP codes, hours, slot length, orders per slot, and alert phones. Click **Send a test text**.
 3. In **Menu**, add your empanadas with photos.
 4. Place a test order using card `4242 4242 4242 4242`, any future date, and any CVC. Confirm the text arrives and the order shows under **Orders**.
 5. Switch to live Stripe keys and a live webhook secret.
@@ -60,6 +60,9 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ---
 
+## Updating an existing database
+If you ran `schema.sql` before the logo feature was added, run `supabase/migration-002-logo.sql` once in the SQL Editor.
+
 ## Security (red-team notes)
 
 | Attack | Defense |
@@ -71,7 +74,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 | Pick a time outside business hours | The submitted slot must exactly match a slot the server is currently offering (hours, lead time, alignment). |
 | Read orders or customer data with the public anon key | RLS is on for every table. Anonymous users get **no** policies. Admin tables require `is_admin()`. |
 | Call admin server actions directly | Every action re-checks `requireAdmin()`, and writes run as the logged-in user, so RLS checks them a second time. |
-| Upload a malicious file as a "photo" | The file type is detected from its actual bytes (JPG/PNG/WebP only, ≤5 MB), the file gets a random name, and the bucket also restricts MIME types. SVG/HTML is impossible. |
+| Upload a malicious file as a photo or logo | The file type is detected from its actual bytes (JPG/PNG/WebP only, ≤5 MB), the file gets a random name, and the bucket also restricts MIME types. SVG/HTML is impossible. |
 | Spam checkout or hold all the slots | Checkout is limited to 10 attempts per IP per 10 minutes (stored in Postgres, so it works on serverless). Unpaid holds expire after about 31 minutes. |
 | Cross-site checkout requests, clickjacking | In production, checkout rejects requests from other origins. CSP, `X-Frame-Options: DENY`, HSTS and nosniff headers are set. |
 | Leak secrets to the browser | Service-role, Stripe and Twilio keys live only in `server-only` modules, and the build fails if a client component imports them. Alert phone numbers are never sent to the storefront. |

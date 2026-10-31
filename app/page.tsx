@@ -29,7 +29,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
     <>
       <header className="band">
         <div className="band-inner">
-          <h1 className="shop-name">{settings.shop_name}</h1>
+          {settings.logo_path ? (
+            <h1 className="shop-logo">
+              <img src={publicImageUrl(settings.logo_path)!} alt={settings.shop_name} />
+            </h1>
+          ) : (
+            <h1 className="shop-name">{settings.shop_name}</h1>
+          )}
           <p>Baked to order. Choose delivery or pickup and the time you want them.</p>
         </div>
       </header>

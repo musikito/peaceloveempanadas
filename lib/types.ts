@@ -17,6 +17,7 @@ export type Settings = {
   days_ahead: number;
   hours: Record<string, DayHours>;
   alert_phones: string[];
+  logo_path: string | null;
   updated_at: string;
 };
 
@@ -32,6 +33,7 @@ export type PublicSettings = Pick<
   | "min_order_cents"
   | "delivery_zips"
   | "pickup_address"
+  | "logo_path"
 >;
 
 export type Product = {

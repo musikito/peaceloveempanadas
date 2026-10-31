@@ -181,6 +181,45 @@ export async function saveSettings(formData: FormData) {
   back("/admin/settings", { ok: "Settings saved." });
 }
 
+// ───────── Logo ─────────
+const MAX_LOGO = 2 * 1024 * 1024;
+
+export async function uploadLogo(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const file = formData.get("logo");
+  if (!(file instanceof File) || file.size === 0) back("/admin/settings", { err: "Choose a logo file first." });
+  if (file.size > MAX_LOGO) back("/admin/settings", { err: "The logo must be 2 MB or smaller." });
+  // Byte check, not filename: blocks SVG/HTML disguised as images (they can run scripts).
+  const kind = await sniffImage(file);
+  if (!kind) back("/admin/settings", { err: "The logo must be a PNG, JPG or WebP. SVG isn't accepted." });
+
+  const path = `logo-${crypto.randomUUID()}.${kind.ext}`;
+  const { error: upErr } = await supabase.storage
+    .from("product-images")
+    .upload(path, file, { contentType: kind.type, upsert: false, cacheControl: "31536000" });
+  if (upErr) back("/admin/settings", { err: "Logo upload failed." });
+
+  const { data: old } = await supabase.from("settings").select("logo_path").eq("id", 1).single();
+  const { error } = await supabase.from("settings").update({ logo_path: path, updated_at: new Date().toISOString() }).eq("id", 1);
+  if (error) {
+    await supabase.storage.from("product-images").remove([path]);
+    back("/admin/settings", { err: "Couldn't save the logo. Did you run migration-002-logo.sql?" });
+  }
+  if (old?.logo_path) await supabase.storage.from("product-images").remove([old.logo_path]);
+  revalidatePath("/", "layout");
+  back("/admin/settings", { ok: "Logo updated." });
+}
+
+export async function removeLogo() {
+  const { supabase } = await requireAdmin();
+  const { data: old } = await supabase.from("settings").select("logo_path").eq("id", 1).single();
+  const { error } = await supabase.from("settings").update({ logo_path: null, updated_at: new Date().toISOString() }).eq("id", 1);
+  if (error) back("/admin/settings", { err: "Couldn't remove the logo." });
+  if (old?.logo_path) await supabase.storage.from("product-images").remove([old.logo_path]);
+  revalidatePath("/", "layout");
+  back("/admin/settings", { ok: "Logo removed. The shop name shows instead." });
+}
+
 export async function sendTestSms() {
   const { supabase } = await requireAdmin();
   const { data } = await supabase.from("settings").select("alert_phones,shop_name").eq("id", 1).single();

@@ -53,6 +53,8 @@ create table if not exists public.settings (
   updated_at           timestamptz not null default now()
 );
 insert into public.settings (id) values (1) on conflict (id) do nothing;
+-- Logo (added later; safe to re-run on an existing database)
+alter table public.settings add column if not exists logo_path text;
 
 -- ───────────────────────── Products ─────────────────────────
 create table if not exists public.products (

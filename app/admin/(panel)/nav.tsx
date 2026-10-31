@@ -11,11 +11,11 @@ const links = [
   { href: "/admin/settings", label: "Settings" },
 ];
 
-export default function Nav({ shopName }: { shopName: string }) {
+export default function Nav({ shopName, logo }: { shopName: string; logo: string | null }) {
   const path = usePathname();
   return (
     <nav className="admin-nav" aria-label="Admin">
-      <strong>{shopName}</strong>
+      {logo ? <img className="admin-logo" src={logo} alt={shopName} /> : <strong>{shopName}</strong>}
       {links.map((l) => (
         <Link key={l.href} href={l.href} aria-current={path === l.href ? "page" : undefined}>{l.label}</Link>
       ))}

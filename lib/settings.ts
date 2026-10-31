@@ -19,5 +19,6 @@ export function toPublicSettings(s: Settings): PublicSettings {
     min_order_cents: s.min_order_cents,
     delivery_zips: s.delivery_zips,
     pickup_address: s.pickup_address,
+    logo_path: s.logo_path ?? null,
   };
 }

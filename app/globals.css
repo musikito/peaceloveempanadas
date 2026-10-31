@@ -43,6 +43,8 @@ h1, h2, h3 { line-height: 1.1; margin: 0; }
   line-height: 0.88;
   font-stretch: 85%;
 }
+.shop-logo { margin: 0; line-height: 0; }
+.shop-logo img { max-height: clamp(96px, 18vw, 180px); max-width: min(100%, 520px); width: auto; object-fit: contain; }
 .band p { color: #fff; max-width: 34ch; margin: 18px 0 0; font-size: 19px; }
 .notice {
   max-width: 1160px; margin: 20px auto 0; padding: 12px 16px;
@@ -127,6 +129,12 @@ textarea.input { resize: vertical; min-height: 64px; }
 @media (min-width: 860px) { .admin { grid-template-columns: 220px 1fr; } }
 .admin-nav { background: var(--cobalt-deep); color: #fff; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
 .admin-nav strong { color: var(--masa); font-size: 22px; margin-bottom: 14px; }
+.admin-logo { max-height: 56px; max-width: 160px; width: auto; object-fit: contain; margin-bottom: 14px; background: #fff; border-radius: var(--radius-sm); padding: 6px; }
+@media (max-width: 859px) { .admin-logo { margin: 0 12px 0 0; max-height: 40px; } }
+.logo-admin { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: center; }
+@media (min-width: 640px) { .logo-admin { grid-template-columns: 240px 1fr; } }
+.logo-preview { background: var(--cobalt); border-radius: var(--radius-sm); min-height: 120px; display: grid; place-items: center; padding: 16px; color: #fff; text-align: center; font-size: 14px; }
+.logo-preview img { max-height: 110px; width: auto; object-fit: contain; }
 .admin-nav a { color: #fff; text-decoration: none; padding: 8px 10px; border-radius: var(--radius-sm); }
 .admin-nav a:hover, .admin-nav a[aria-current="page"] { background: rgba(255, 255, 255, 0.12); }
 .admin-nav form { margin-top: auto; }
